@@ -470,18 +470,7 @@ stargazer(did_model,
 combined_data <- combined_data %>%
   mutate(predicted_production = predict(did_model))
 
-ggplot(combined_data, aes(x = year, y = production, color = industry, group = interaction(industry, post_treatment))) +
-  geom_line(size = 1.2, aes(linetype = ifelse(post_treatment == 1, "Post-Treatment", "Pre-Treatment"))) +
-  geom_line(aes(y = predicted_production), linetype = "dashed", size = 1) +
-  geom_vline(xintercept = 96.5, linetype = "dashed", color = "red") +
-  labs(
-    title = "Difference-in-Differences Analysis",
-    x = "Year",
-    y = "Production (Adjusted for Inflation)",
-    color = "Industry",
-    linetype = "Period"
-  ) +
-  theme_minimal()
+
 
 ```
 ## Interpretation of Dif in Dif
