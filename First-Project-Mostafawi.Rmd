@@ -307,30 +307,8 @@ ggplot(clothing, aes(x = year, y = real_exchangerate)) +
 
 
 ```
-```{r}
 
 
-
-clothing_long <- clothing %>%
-  pivot_longer(cols = c("production", "sales", "directexportmilrial","real_exchangerate"), 
-               names_to = "MainValues", 
-               values_to = "MillionRial")
-
-# Create the combined plot
-ggplot(clothing_long, aes(x = year, y = MillionRial, color = MainValues)) +
-  geom_line() +
-  scale_x_continuous(breaks = seq(min(clothing$year), max(clothing$year), by = 1)) +
-  labs(
-    title = "Real Exchange Rate and Main Values ",
-    x = "Year",
-    y = "MillionRial",
-    color = "MainValues"
-  ) +
-  theme_minimal()
-  
-
-
-```
 ```{r}
 
 plot1 <- ggplot(clothing, aes(x = year, y = real_exchangerate)) +
