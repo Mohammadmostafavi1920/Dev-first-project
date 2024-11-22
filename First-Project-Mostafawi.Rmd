@@ -63,9 +63,6 @@ data <- data[-1, ]
 colnames(data) <- c("year", "industrycode2", "industrycode", "industry", "workshopnumber", "owntaavoni", "ownprivate", "ownpublic", "manageprivate", "managepublic", "workersum", "workermen", "workerwomen", "withwagemen", "withwagewomen", "withoutwagemen", "withoutwagewomen", "compensationservices", "rawmaterial", "rawmaterialimported", "production", "sales", "directexportmilrial", "directexportkdollar", "inputvalue", "outputvalue", "addedvalueofindustry", "nonindustrialservicesrecieved", "nonindustrialservicespayed", "indirecttaxes", "changeininventory", "capitalformation")
 
 
-# Save the resulting dataset to an Excel file
-write.xlsx(data, file = "M:/TeIAS/Semester 3/Development Economics/Projects/First Project/updated_dataset.xlsx")
-
 
 
 
