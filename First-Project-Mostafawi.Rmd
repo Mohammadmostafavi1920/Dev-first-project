@@ -1,0 +1,527 @@
+---
+title: "Develpment-Economics-Project1"
+author: "Mohammad Mostafawi"
+date: "11/13/2024"
+output: html_document
+---
+
+### clothing Industry
+
+# Relevance
+
+The relevance of clothing industry to industrial policies and exchange rate 
+fluctuations is somehow interesting. clothing industry in Iran is very 
+sensitive to exchange rate. the reason is not beacuse of raw materials 
+but is because of smuggling. the point in this industry is that when 
+exchange rate is low, smugglers start to import clothing. and when the 
+rate of exchange is high, smugglers loose their incentive to import the 
+clothing. 
+
+
+
+
+
+# Economic and Institutional Context
+
+This industry include many low skill and woman workforce in comparison to other 
+industries. its overall a labor intensive industry that provide job for many. 
+effects on this industry can affect society specially urban densities in many 
+ways. 
+
+
+
+
+# Evidence
+https://etkfz.com/newsPage?code=65OSy2XeDF
+
+in this link you can read more about is the situation of this industry in response
+to fluctuations in exchange rate. 
+
+
+
+```{r}
+
+# Load necessary libraries
+library(readxl)
+library(dplyr)
+library(openxlsx)
+library(ggplot2)
+library(tidyr)
+library(patchwork)  
+library(stargazer)
+
+
+# Load the dataset from the Excel file, specifying the correct sheet name
+file_path <- "M:/TeIAS/Semester 3/Development Economics/Projects/First Project/all.xlsx"
+data <- read_excel(file_path, sheet = "سری زمانی", col_names = FALSE)
+
+# Drop the first row of the dataset
+data <- data[-1, ]
+
+
+# Display the resulting dataset
+colnames(data) <- c("year", "industrycode2", "industrycode", "industry", "workshopnumber", "owntaavoni", "ownprivate", "ownpublic", "manageprivate", "managepublic", "workersum", "workermen", "workerwomen", "withwagemen", "withwagewomen", "withoutwagemen", "withoutwagewomen", "compensationservices", "rawmaterial", "rawmaterialimported", "production", "sales", "directexportmilrial", "directexportkdollar", "inputvalue", "outputvalue", "addedvalueofindustry", "nonindustrialservicesrecieved", "nonindustrialservicespayed", "indirecttaxes", "changeininventory", "capitalformation")
+
+
+# Save the resulting dataset to an Excel file
+write.xlsx(data, file = "M:/TeIAS/Semester 3/Development Economics/Projects/First Project/updated_dataset.xlsx")
+
+
+
+
+
+
+
+```
+## Data Summaries 
+
+# Number of Workshops
+
+
+```{r}
+
+# Filter data for industries with code 14
+clothing <- data %>% filter(industrycode == 14)
+clothing <- clothing[, !(names(clothing) %in% c("industry"))]
+clothing$year <- as.numeric(sub("^13", "", clothing$year))
+
+# Convert all remaining columns to numeric
+clothing <- data.frame(lapply(clothing, as.numeric))
+
+
+ggplot(clothing, aes(x = year, y = workshopnumber)) +
+  geom_line() +
+  scale_x_continuous(breaks = seq(min(clothing$year), max(clothing$year), by = 1)) +
+  labs(title = "Number of Workshops of Clothing Industry", x = "Year", y = "Number of Workshops")
+
+
+
+
+# Reshape the data to long format
+clothing_long <- clothing %>%
+  pivot_longer(cols = c("ownprivate", "owntaavoni", "ownpublic"), 
+               names_to = "OwnershipType", 
+               values_to = "NumberOfWorkshops")
+
+# Create the combined plot
+ggplot(clothing_long, aes(x = year, y = NumberOfWorkshops, color = OwnershipType)) +
+  geom_line() +
+  scale_x_continuous(breaks = seq(min(clothing$year), max(clothing$year), by = 1)) +
+  labs(
+    title = "Comparison of Workshop Numbers in Clothing Industry by Ownership Type",
+    x = "Year",
+    y = "Number of Workshops",
+    color = "Ownership Type"
+  ) +
+  theme_minimal()
+
+
+```
+
+as we can see in number of workshops, most of this industry is owned by private sector 
+then we can consider this sector mostly a private sector. 
+
+
+## Number of All Employee by Gender
+
+
+```{r}
+
+
+
+clothing_long <- clothing %>%
+  pivot_longer(cols = c("workersum", "workermen", "workerwomen"), 
+               names_to = "Gendertype", 
+               values_to = "NumberOfWorkers")
+
+# Create the combined plot
+ggplot(clothing_long, aes(x = year, y = NumberOfWorkers, color = Gendertype)) +
+  geom_line() +
+  scale_x_continuous(breaks = seq(min(clothing$year), max(clothing$year), by = 1)) +
+  labs(
+    title = "Total,men and women workers of clothing industry",
+    x = "Year",
+    y = "Number of Workers",
+    color = "Gendertype"
+  ) +
+  theme_minimal()
+
+
+
+
+```
+
+
+
+```{r}
+
+
+
+
+clothing_long <- clothing %>%
+  pivot_longer(cols = c("withwagemen", "withoutwagemen", "withwagewomen","withoutwagewomen"), 
+               names_to = "WageStatusofMenandwomen", 
+               values_to = "NumberOfWorkers")
+
+# Create the combined plot
+ggplot(clothing_long, aes(x = year, y = NumberOfWorkers, color = WageStatusofMenandwomen)) +
+  geom_line() +
+  scale_x_continuous(breaks = seq(min(clothing$year), max(clothing$year), by = 1)) +
+  labs(
+    title = "Number of Men and women with and without Wage",
+    x = "Year",
+    y = "Number of Workers",
+    color = "WageStatusofMen"
+  ) +
+  theme_minimal()
+
+
+
+```
+There is a very interesting plot since we see that in 81 the percentage of women in the industry is far less than what it is in 90 which they are almost the same. for 93 and 94 
+the percentage of women are more than men which is not a common phenomena in Iran's ecnonmy. 
+
+
+
+
+
+
+
+
+
+```{r}
+
+
+
+
+clothing_long <- clothing %>%
+  pivot_longer(cols = c("production", "sales", "directexportmilrial","capitalformation"), 
+               names_to = "MainValues", 
+               values_to = "MillionRial")
+
+# Create the combined plot
+ggplot(clothing_long, aes(x = year, y = MillionRial, color = MainValues)) +
+  geom_line() +
+  scale_x_continuous(breaks = seq(min(clothing$year), max(clothing$year), by = 1)) +
+  labs(
+    title = "Main Values of Clothing Industry",
+    x = "Year",
+    y = "MillionRial",
+    color = "MainValues"
+  ) +
+  theme_minimal()
+
+
+
+
+
+```
+
+## Real Values 
+in order to make fluctuations in export and production and other important values, we need to consider all of them in real terms. then we use year 80 as base year and adjust all values to real values based on year 80. 
+```{r}
+
+
+
+
+inflation <- read_excel("M:/TeIAS/Semester 3/Development Economics/Projects/First Project/inflation.xlsx")
+
+# Ensure the inflation rates are numeric and the year columns match
+inflation <- inflation %>% mutate(year = as.numeric(year), inflation = as.numeric(inflation))
+inflation$year <- as.numeric(sub("^13", "", inflation$year))
+
+# Merge the inflation dataset with your main clothing dataset by 'year'
+clothing <- clothing %>%
+  left_join(inflation, by = "year")  # Add inflation rates to clothing data
+# Base year (choose the first year in your dataset or a reference year)
+base_year <- min(clothing$year)
+clothing$inflation <- clothing$inflation / 100
+
+# Calculate the cumulative inflation factor
+clothing$CumulativeInflation <- cumprod(1 + clothing$inflation)
+clothing$CumulativeInflation <- clothing$CumulativeInflation / clothing$CumulativeInflation[clothing$year == base_year]
+
+# Adjust columns for inflation
+adjust_columns <- c("sales", "production", "directexportmilrial", "capitalformation")
+clothing[adjust_columns] <- lapply(clothing[adjust_columns], function(column) column / clothing$CumulativeInflation)
+
+
+
+
+
+
+
+```
+
+```{r}
+
+
+
+clothing_long <- clothing %>%
+  pivot_longer(cols = c("production", "sales", "directexportmilrial","capitalformation"), 
+               names_to = "MainValues", 
+               values_to = "MillionRial")
+
+# Create the combined plot
+ggplot(clothing_long, aes(x = year, y = MillionRial, color = MainValues)) +
+  geom_line() +
+  scale_x_continuous(breaks = seq(min(clothing$year), max(clothing$year), by = 1)) +
+  labs(
+    title = "Main Values of Clothing Industry in Real Terms",
+    x = "Year",
+    y = "MillionRial",
+    color = "MainValues"
+  ) +
+  theme_minimal()
+  
+
+
+```
+
+## Exchange Rate
+in this part of analysis, I want to check the effects of exchange rate fluctuations on clothing industry. I need to firstly see that how is these fluctuations. for this I use the data of fluctuations from Daghighe site which is included in package of my analysis. 
+
+
+```{r}
+
+exchange <- read_excel("M:/TeIAS/Semester 3/Development Economics/Projects/First Project/yearly_exchange_rates_filtered.xlsx")
+
+exchange <- exchange %>% mutate(year = as.numeric(year), exchangerate = as.numeric(exchangerate))
+
+clothing <- clothing %>%
+  left_join(exchange, by = "year") 
+
+clothing$real_exchangerate <- clothing$exchangerate / clothing$CumulativeInflation
+
+```
+```{r}
+ggplot(clothing, aes(x = year, y = real_exchangerate)) +
+  geom_line(color = "green", size = 1) +  # Line for real exchange rate
+  geom_point(color = "purple", size = 2) +  # Points for each year
+  scale_x_continuous(
+    breaks = seq(min(clothing$year), max(clothing$year), by = 1)  # Display each year
+  ) +
+  labs(
+    title = "Real Exchange Rate Fluctuations Over the Years",
+    x = "Year",
+    y = "Real Exchange Rate"
+  ) +
+  theme_minimal()
+
+
+```
+```{r}
+
+
+
+clothing_long <- clothing %>%
+  pivot_longer(cols = c("production", "sales", "directexportmilrial","real_exchangerate"), 
+               names_to = "MainValues", 
+               values_to = "MillionRial")
+
+# Create the combined plot
+ggplot(clothing_long, aes(x = year, y = MillionRial, color = MainValues)) +
+  geom_line() +
+  scale_x_continuous(breaks = seq(min(clothing$year), max(clothing$year), by = 1)) +
+  labs(
+    title = "Real Exchange Rate and Main Values ",
+    x = "Year",
+    y = "MillionRial",
+    color = "MainValues"
+  ) +
+  theme_minimal()
+  
+
+
+```
+```{r}
+
+plot1 <- ggplot(clothing, aes(x = year, y = real_exchangerate)) +
+  geom_line(color = "green", size = 1) +
+  geom_point(color = "purple", size = 2) +
+  scale_x_continuous(
+    breaks = seq(min(clothing$year), max(clothing$year), by = 1)
+  ) +
+  labs(
+    title = "Real Exchange Rate Fluctuations Over the Years",
+    x = "Year",
+    y = "Real Exchange Rate"
+  ) +
+  theme_minimal()
+
+# Prepare data for lower plot (pivot longer for multiple variables)
+clothing_long <- clothing %>%
+  pivot_longer(cols = c(production, sales, directexportmilrial),
+               names_to = "Variable", values_to = "Value")
+
+# Lower plot: Main values (production, sales, directexportmilrial)
+plot2 <- ggplot(clothing_long, aes(x = year, y = Value, color = Variable)) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  scale_x_continuous(
+    breaks = seq(min(clothing$year), max(clothing$year), by = 1)
+  ) +
+  labs(
+    title = "Production, Sales, and Direct Export (Mil Rials) Over the Years",
+    x = "Year",
+    y = "Values"
+  ) +
+  theme_minimal()
+
+# Combine plots vertically
+combined_plot <- plot1 / plot2
+print(combined_plot)
+
+
+
+```
+As we see in this plot, the main fluctuations happened in 96-97. 
+in second plot we see in both this fluctuation, there is an upward 
+in production and sales of clothing industry. 
+The reason behind this happening is that when exchange rate increases, the smuggling stops and smugglers loose their incentives to smuggle clothing into country. Now in order to show the causality in this process, I need to use a control group and use a dif in dif methodology. The control group for my work I think can be food industry which is not exposed to smuggling and there is no smuggling for it from outside to inside of country. 
+
+## Leather industry as a Control Group
+
+Leather industry 
+
+```{r}
+# Filter data for the leather industry (industry code 15)
+leather <- data %>% filter(industrycode == 15)
+
+# Drop the "industry" column
+leather <- leather[, !(names(leather) %in% c("industry"))]
+
+# Convert year column to numeric (remove prefix 13)
+leather$year <- as.numeric(sub("^13", "", leather$year))
+
+# Convert all remaining columns to numeric
+leather <- data.frame(lapply(leather, as.numeric))
+
+# Merge the inflation dataset with the leather dataset by 'year'
+leather <- leather %>%
+  left_join(inflation, by = "year")  # Add inflation rates to leather data
+
+# Base year (choose the first year in the dataset or a reference year)
+base_year <- min(leather$year)
+leather$inflation <- leather$inflation / 100
+
+# Calculate the cumulative inflation factor
+leather$CumulativeInflation <- cumprod(1 + leather$inflation)
+leather$CumulativeInflation <- leather$CumulativeInflation / leather$CumulativeInflation[leather$year == base_year]
+
+# Adjust columns for inflation
+adjust_columns <- c("sales", "production", "directexportmilrial", "capitalformation")
+leather[adjust_columns] <- lapply(leather[adjust_columns], function(column) column / leather$CumulativeInflation)
+
+```
+```{r}
+
+plot1 <- ggplot(clothing, aes(x = year, y = real_exchangerate)) +
+  geom_line(color = "green", size = 1) +
+  geom_point(color = "purple", size = 2) +
+  scale_x_continuous(
+    breaks = seq(min(clothing$year), max(clothing$year), by = 1)
+  ) +
+  labs(
+    title = "Real Exchange Rate Fluctuations Over the Years",
+    x = "Year",
+    y = "Real Exchange Rate"
+  ) +
+  theme_minimal()
+
+# Prepare data for lower plot (pivot longer for multiple variables)
+leather_long <- leather %>%
+  pivot_longer(cols = c(production, sales, directexportmilrial),
+               names_to = "Variable", values_to = "Value")
+
+# Lower plot: Main values (production, sales, directexportmilrial)
+plot2 <- ggplot(leather_long, aes(x = year, y = Value, color = Variable)) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  scale_x_continuous(
+    breaks = seq(min(leather$year), max(leather$year), by = 1)
+  ) +
+  labs(
+    title = "Production, Sales, and Direct Export (Mil Rials) Over the Years For Leather industry",
+    x = "Year",
+    y = "Values"
+  ) +
+  theme_minimal()
+
+# Combine plots vertically
+combined_plot <- plot1 / plot2
+print(combined_plot)
+
+```
+```{r}
+clothing$industry <- "Clothing"
+leather$industry <- "Leather"
+combined_data <- bind_rows(clothing, leather)
+
+# Define pre- and post-treatment periods
+combined_data <- combined_data %>%
+  mutate(
+    post_treatment = ifelse(year >= 96, 1, 0),  # Post-treatment indicator
+    treated = ifelse(industry == "Clothing", 1, 0)  # Treatment group indicator
+  )
+
+# Parallel Trends Plot
+ggplot(combined_data, aes(x = year, y = production, color = industry, group = industry)) +
+  geom_line(size = 1.2) +
+  geom_vline(xintercept = 96.5, linetype = "dashed", color = "red") +
+  labs(
+    title = "Parallel Trends Before Treatment",
+    x = "Year",
+    y = "Production (Adjusted for Inflation)",
+    color = "Industry"
+  ) +
+  theme_minimal()
+
+# Difference-in-Differences Regression
+did_model <- lm(production ~ post_treatment * treated + post_treatment + treated, data = combined_data)
+
+# Summary Table of Results
+stargazer(did_model, 
+          type = "latex", 
+          title = "Difference-in-Differences Regression Results", 
+          label = "tab:did_results",
+          dep.var.labels = c("Production"),
+          covariate.labels = c("Post-Treatment * Treated", 
+                               "Post-Treatment", 
+                               "Treated"),
+          out = "did_results.tex")
+
+# DiD Effect Visualization
+combined_data <- combined_data %>%
+  mutate(predicted_production = predict(did_model))
+
+ggplot(combined_data, aes(x = year, y = production, color = industry, group = interaction(industry, post_treatment))) +
+  geom_line(size = 1.2, aes(linetype = ifelse(post_treatment == 1, "Post-Treatment", "Pre-Treatment"))) +
+  geom_line(aes(y = predicted_production), linetype = "dashed", size = 1) +
+  geom_vline(xintercept = 96.5, linetype = "dashed", color = "red") +
+  labs(
+    title = "Difference-in-Differences Analysis",
+    x = "Year",
+    y = "Production (Adjusted for Inflation)",
+    color = "Industry",
+    linetype = "Period"
+  ) +
+  theme_minimal()
+
+```
+## Interpretation of Dif in Dif
+The interpretation is this: 
+Intercept is 2040886 which is significant and its p value is very small. 
+post treatment is -289938 which is not significant and its p value is bigger than what it is happening.
+The treated which is the the difference between treatment and control before treatment is significant and its value is -747160.
+Post treatment:treated is not significant which shows that after happening treatment, both treatment and control groups are similar and their difference is not significant.
+
+The results suggest that the treatment did not have a statistically significant impact on the production of the clothing industry relative to the leather industry during the analyzed period. Further analysis or alternative control groups may be needed to draw stronger conclusions.
+
+
+
+
+
+
+
+
